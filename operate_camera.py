@@ -14,18 +14,20 @@ def takePicture():
         rval = False
 
     while rval:
-        cv2.imshow("Vorschau", frame)
+        cv2.imshow("Preview", frame)
         rval, frame = cam.read()
+
+        #check if a key is pressed
         key = cv2.waitKey(20)
-        if key == 27: # exit on ESC
+        if key == 27:           #ESC
             break
-        elif key == 32:
+        elif key == 32:         #Spacebar
             img_name = "camera_output.png"
             cv2.imwrite("data/" + img_name, frame)
             print("> Picture taken sucessfully!")
             break
 
-    cv2.destroyWindow("Vorschau")
+    cv2.destroyWindow("Preview")
     cam.release()
 
 if __name__ == "__main__":

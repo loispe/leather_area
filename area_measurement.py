@@ -1,11 +1,12 @@
 from math import exp
 from tracemalloc import start
 from PIL import Image
+import imutils
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-source_image = "data\haut_bsp.jpg"
+source_image = "data/test_area_edited.jpg"
 
 #----------------------------------------------------------------------
 def visualizePixels(pixels, img):
@@ -45,6 +46,7 @@ def scanForEdges(pixel_arr, edgedImage):
 def startCalc():
     #duplicate and rotate the original picture to capture indents in the skin edge no matter of their direction
     haut = cv2.imread(source_image)
+    haut = imutils.resize(haut, width=720, height=1080)     #add resize when taking the picture 
     haut_90 = cv2.rotate(haut, cv2.ROTATE_90_CLOCKWISE)
     cv2.imwrite("data\Haut_bsp_90.jpg", haut_90)
 
@@ -72,10 +74,15 @@ def startCalc():
                 pixels_combined[y, x] = 1     
                 pixel_cnt += 1
 
+    #read out calibration
+    f = open("calibration.txt", "r")
+    calibration = float(f.readline())
+
     # Print size
     print(f"Leather pixel count: {pixel_cnt} Pixel")#
-    print(f"Calibration: 1 Pixel = 91.796*10^-6 m^2")
-    print(f"Leather surface area = {pixel_cnt * 0.000091796} m^2")
+    print(f"Calibration: 1 Pixel length = {calibration}m")
+    print(f"Calibration: 1 Pixel area   = {calibration**2}m^2")
+    print(f"Leather surface area = {pixel_cnt * (calibration ** 2)} m^2")
 
     #convert binary array to cv2 image
     cv2.imwrite("data\maske_ergebnis.jpg", pixels_combined * 255)
