@@ -1,12 +1,10 @@
-from math import exp
-from tracemalloc import start
 from PIL import Image
 import imutils
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-source_image = "data/test_area_edited.jpg"
+source_image = "data/test_tuer_1.jpg"
 
 #----------------------------------------------------------------------
 def visualizePixels(pixels, img):
@@ -46,9 +44,10 @@ def scanForEdges(pixel_arr, edgedImage):
 def startCalc():
     #duplicate and rotate the original picture to capture indents in the skin edge no matter of their direction
     haut = cv2.imread(source_image)
-    haut = imutils.resize(haut, width=720, height=1080)     #add resize when taking the picture 
+    haut = imutils.resize(haut, width=1080, height=2040)     #add resize when taking the picture 
+    cv2.imwrite("data\Haut.jpg", haut)
     haut_90 = cv2.rotate(haut, cv2.ROTATE_90_CLOCKWISE)
-    cv2.imwrite("data\Haut_bsp_90.jpg", haut_90)
+    cv2.imwrite("data\Haut_90.jpg", haut_90)
 
     #edge detection
     haut_grey = cv2.cvtColor(haut, cv2.COLOR_BGR2GRAY)
@@ -63,7 +62,7 @@ def startCalc():
     area_pixels = getAreafromEdges(im_haut_edged)
     area_pixels_90 = getAreafromEdges(im_haut_edged_90)
 
-    #combine the two area arrays into a single one
+    #combine the two area arrays into a single one by overlaying them
     pixels_combined = np.add(np.flip((area_pixels_90.T), 0), area_pixels)
     pixel_cnt = 0
     for x in range(im_haut_edged.size[0]):
@@ -76,26 +75,27 @@ def startCalc():
 
     #read out calibration
     f = open("calibration.txt", "r")
-    calibration = float(f.readline())
+    calibration_mm = float(f.readline())
+    area_sqm = pixel_cnt * ((calibration_mm/1000) ** 2)
+    area_sqf = area_sqm * 10.7639
 
     # Print size
-    print(f"Leather pixel count: {pixel_cnt} Pixel")#
-    print(f"Calibration: 1 Pixel length = {calibration}m")
-    print(f"Calibration: 1 Pixel area   = {calibration**2}m^2")
-    print(f"Leather surface area = {pixel_cnt * (calibration ** 2)} m^2")
+    print(f"Leather pixel count: {pixel_cnt} Pixel")
+    print(f"Calibration: 1 Pixel    = {calibration_mm**2:.3f} mm^2")
+    print(f"Leather surface area    = {area_sqm:.6f} m^2")
+    print(f"                        = {area_sqf:.6f} f^2")
 
     #convert binary array to cv2 image
     cv2.imwrite("data\maske_ergebnis.jpg", pixels_combined * 255)
     mask = Image.open("data\maske_ergebnis.jpg").convert("RGB")  
 
-    # Show result
-    plt_img = plt.imread(source_image)
-    plt_img_90 = plt.imread("data\haut_bsp_90.jpg")
-    visualizePixels(area_pixels, plt_img)
-    visualizePixels(area_pixels_90, plt_img_90)
+    # Show results of area detection
+    # visualizePixels(area_pixels, haut)        #debugging
+    # visualizePixels(area_pixels_90, haut_90)  #debugging
+    visualizePixels(pixels_combined, haut)
 
-    background = cv2.imread(source_image)
-    haut_maske = cv2.addWeighted(np.array(mask), 0.4, np.array(background), 0.6, 0)
+    #layer mask and original image to allow visual verification of the detected area
+    haut_maske = cv2.addWeighted(np.array(mask), 0.4, np.array(haut), 0.6, 0)
     cv2.imwrite("data\haut+maske.jpg", haut_maske)
     cv2.imshow("Haut + Maske", haut_maske)
 

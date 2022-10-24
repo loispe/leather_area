@@ -1,18 +1,14 @@
-from tkinter import Image
 import cv2
-from PIL import Image
-import numpy as np
 import imutils
 import math
-import sys
 
 #image_path = "data/camera_output.png"
-image_path = "data/test_cal.jpg"
+image_path = "data/cal_tuer_1.JPG"
+CAL_MARKER_DISTANCE_MM = 97   #mm
 #----------------------------------------------------------------------
 def detectMarker():
     img = cv2.imread(image_path)
-    img = imutils.resize(img, width=720, height=1080)   #has to be changed in area_measurement as well
-
+    img = imutils.resize(img, width=1080, height=2040)
     aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
     aruco_Params = cv2.aruco.DetectorParameters_create()
     (corners, ids, rejected) = cv2.aruco.detectMarkers(img, aruco_dict, parameters=aruco_Params)
@@ -29,6 +25,7 @@ def detectMarker():
             bottom_right_corner = (int(bottom_right_corner[0]), int(bottom_right_corner[1]))
             bottom_left_corner = (int(bottom_left_corner[0]), int(bottom_left_corner[1]))
             
+            #draw square around marker
             cv2.line(img, top_left_corner, top_right_corner, (0, 0, 255), 1)
             cv2.line(img, top_right_corner, bottom_right_corner, (0, 0, 255), 1)
             cv2.line(img, bottom_right_corner, bottom_left_corner, (0, 0, 255), 1)
@@ -78,21 +75,21 @@ def calcPixelLen(img, c0, c1):
     # opposite = math.sqrt(len_leg0 ** 2 + len_leg1 ** 2)     # opposite given in pixels = 1 meter
     # pixel_len = 1 / opposite                                # 1000/opposite => length of one pixel in meter
 
-    alpha = math.atan(len_leg0/len_leg1)
-    pixel_len = (math.cos(alpha) * 1) / len_leg1
+    alpha = math.atan(len_leg0/len_leg1)                        #calc angle alpha between leg1 and opposite by using tan(a) = leg0/leg1 (in pixels)
+    pixel_len_mm = (math.cos(alpha) * CAL_MARKER_DISTANCE_MM) / len_leg1                #leg1 (in meter) = cos(a) * opposite (in meter)  
 
 
-    print(f"Pixel length: f{pixel_len:.9f}m")
+    print(f"Pixel length: f{pixel_len_mm:.9f} mm")
 
     f = open("calibration.txt", "w")
-    f.write(str(pixel_len))
+    f.write(str(pixel_len_mm))
     f.close()
     print("> Calibration saved!")
 
     
     cv2.imshow("Calibration", img)
     cv2.waitKey(0)
-    return pixel_len
+    return pixel_len_mm
 #----------------------------------------------------------------------
 def main():
     img, pos0, pos1 = detectMarker()
