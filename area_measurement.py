@@ -1,10 +1,17 @@
 from PIL import Image
 import imutils
 import cv2
-import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib import pyplot as plt
 import numpy as np
+import os
 
-source_image = "data/test_tuer_1.jpg"
+#os.environ["QT_QPA_PLATFORM"] = "xcb"
+print(os.environ.get("QT_QPA_PLATFORM"))
+
+#matplotlib.use('TkAgg')
+
+source_image = "data/measurement_pic.jpg"
 
 #----------------------------------------------------------------------
 def visualizePixels(pixels, img):
@@ -45,17 +52,17 @@ def startCalc():
     #duplicate and rotate the original picture to capture indents in the skin edge no matter of their direction
     haut = cv2.imread(source_image)
     haut = imutils.resize(haut, width=1080, height=2040)     #add resize when taking the picture 
-    cv2.imwrite("data\Haut.jpg", haut)
+    cv2.imwrite("data/Haut.jpg", haut)
     haut_90 = cv2.rotate(haut, cv2.ROTATE_90_CLOCKWISE)
-    cv2.imwrite("data\Haut_90.jpg", haut_90)
+    cv2.imwrite("data/Haut_90.jpg", haut_90)
 
     #edge detection
     haut_grey = cv2.cvtColor(haut, cv2.COLOR_BGR2GRAY)
     haut_edged = cv2.Canny(haut_grey, 30, 200)
-    cv2.imwrite("data\Haut_Umrisse.jpg", haut_edged)
+    cv2.imwrite("data/Haut_Umrisse.jpg", haut_edged)
 
     #rotate edged picture
-    im_haut_edged = Image.open("data\Haut_Umrisse.jpg")
+    im_haut_edged = Image.open("data/Haut_Umrisse.jpg")
     im_haut_edged_90 = im_haut_edged.rotate(270, Image.NEAREST, expand = 1)
 
     #ectract the pixels which are enclosed by the skin edge as a 2d array
@@ -86,8 +93,8 @@ def startCalc():
     print(f"                        = {area_sqf:.6f} f^2")
 
     #convert binary array to cv2 image
-    cv2.imwrite("data\maske_ergebnis.jpg", pixels_combined * 255)
-    mask = Image.open("data\maske_ergebnis.jpg").convert("RGB")  
+    cv2.imwrite("data/maske_ergebnis.jpg", pixels_combined * 255)
+    mask = Image.open("data/maske_ergebnis.jpg").convert("RGB")  
 
     # Show results of area detection
     # visualizePixels(area_pixels, haut)        #debugging
@@ -96,11 +103,12 @@ def startCalc():
 
     #layer mask and original image to allow visual verification of the detected area
     haut_maske = cv2.addWeighted(np.array(mask), 0.4, np.array(haut), 0.6, 0)
-    cv2.imwrite("data\haut+maske.jpg", haut_maske)
-    cv2.imshow("Haut + Maske", haut_maske)
+    cv2.imwrite("data/haut+maske.jpg", haut_maske)
+    cv2.imshow("Haut mit Maske", haut_maske)
+    cv2.waitKey(0)
 
     # Showing the result in a plot:
-    # plt_img_haut_maske = plt.imread("data\haut+maske.jpg")
+    # plt_img_haut_maske = plt.imread("data/haut+maske.jpg")
     # fig, ax = plt.subplots()
     # ax.imshow(plt_img_haut_maske)
 

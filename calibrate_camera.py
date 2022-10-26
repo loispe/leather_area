@@ -3,7 +3,7 @@ import imutils
 import math
 
 #image_path = "data/camera_output.png"
-image_path = "data/cal_tuer_1.JPG"
+image_path = "data/camera_output.jpg"
 CAL_MARKER_DISTANCE_MM = 97   #mm
 #----------------------------------------------------------------------
 def detectMarker():
@@ -67,7 +67,7 @@ def calcPixelLen(img, c0, c1):
     cv2.line(img, c0, c1,  (255, 0, 0), 1)  #opposite
     cv2.line(img, c1, c2, (255, 0, 0), 1)   #leg1
 
-    cv2.imwrite("data\current_calibration.jpg", img)
+    cv2.imwrite("data/current_calibration.jpg", img)
 
     len_leg0 = abs(c0[1] - c2[1])
     len_leg1 = abs(c1[0] - c2[0])
