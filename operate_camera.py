@@ -1,15 +1,18 @@
-from tabnanny import check
 import cv2
+import imutils
 import subprocess
 
-#pkill -f gphoto2
+CAM_PIXEL_WIDTH = 4288
+CAM_PIXEL_HEIGHT = 2848
 
+#pkill -f gphoto2
+#----------------------------------------------------------------------
 def callShellCmd(command_arr):
     process = subprocess.Popen(command_arr,
         stdout = subprocess.PIPE)
 
     return process.communicate()[0].decode()
-
+#----------------------------------------------------------------------
 def takePicture(file_name):
 
     capture_rtn = callShellCmd([
@@ -18,8 +21,13 @@ def takePicture(file_name):
         "--filename", "/home/louis/projects/leather_area/data/" + file_name + ".jpg",
         "--force-overwrite"])
 
-    print(capture_rtn)
+    #resize image to minimize future processing time
+    img = cv2.imread("data/" + file_name + ".jpg")
+    img = imutils.resize(img, width = int(CAM_PIXEL_WIDTH / 2))
+    cv2.imwrite("data/" + file_name + ".jpg", img)
 
+    print(capture_rtn)
+#----------------------------------------------------------------------
 def killProcesses():
     kill_rtn = callShellCmd(["pkill", "gphoto2"])
 
@@ -27,7 +35,7 @@ def killProcesses():
         return True
     else:
         return False
-
+#----------------------------------------------------------------------
 def checkCamera():
     detect_rtn = callShellCmd([
         "gphoto2", "--auto-detect"])
@@ -38,46 +46,8 @@ def checkCamera():
     else:
         print("Couldn't find any Camera. Please check the USB connection and if the camera is turned on! ")
         return False
-# def checkCamera():
-#     process = subprocess.Popen([
-#         "gphoto2",
-#         "--capture-image-and-download",
-#         "--filename", "/home/louis/projects/leather_area/data/camera_output.jpg"],
-#         stdout = subprocess.PIPE)
-
-#     rtn_str = process.communicate()[0]
-#     print(rtn_str)
-
-# #----------------------------------------------------------------------
-# def takePicture():
-#     cv2.namedWindow("Vorschau")
-#     cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-#     cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-#     cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
-#     if cam.isOpened(): 
-#         rval, frame = cam.read()
-#     else:
-#         rval = False
-
-#     while rval:
-#         cv2.imshow("Preview", frame)
-#         rval, frame = cam.read()
-
-#         #check if a key is pressed
-#         key = cv2.waitKey(20)
-#         if key == 27:           #ESC
-#             break
-#         elif key == 32:         #Spacebar
-#             img_name = "camera_output.png"
-#             cv2.imwrite("data/" + img_name, frame)
-#             print("> Picture taken sucessfully!")
-#             break
-
-#     cv2.destroyWindow("Preview")
-#     cam.release()
 
 if __name__ == "__main__":
     killProcesses()
     if checkCamera():
-        takePicture()
+        takePicture("test")

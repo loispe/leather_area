@@ -3,15 +3,18 @@ import imutils
 import math
 
 #image_path = "data/camera_output.png"
-image_path = "data/camera_output.jpg"
+image_path = "data/calibration_pic.jpg"
 CAL_MARKER_DISTANCE_MM = 97   #mm
 #----------------------------------------------------------------------
 def detectMarker():
+    marker_0_pos = [-1, -1]
+    marker_1_pos = [-1, -1]
+
     img = cv2.imread(image_path)
-    img = imutils.resize(img, width=1080, height=2040)
     aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
     aruco_Params = cv2.aruco.DetectorParameters_create()
     (corners, ids, rejected) = cv2.aruco.detectMarkers(img, aruco_dict, parameters=aruco_Params)
+
 
     if len(corners) > 0:
         ids = ids.flatten()
@@ -40,7 +43,13 @@ def detectMarker():
                 marker_0_pos = [center_x, center_y]
             elif id == 1:
                 marker_1_pos = [center_x, center_y]
+
+    else:
+        raise UnboundLocalError("No markers detected! Make sure the calibration stick is placed in the pciture frame.")
             
+    if marker_0_pos[0] == -1 or marker_1_pos[0] == -1:
+        raise UnboundLocalError("Coulnd't detect all marker edges! Check calibration picture!")
+
     return img, marker_0_pos, marker_1_pos
 #----------------------------------------------------------------------
 

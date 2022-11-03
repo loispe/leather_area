@@ -7,8 +7,7 @@ import numpy as np
 import os
 
 #os.environ["QT_QPA_PLATFORM"] = "xcb"
-print(os.environ.get("QT_QPA_PLATFORM"))
-
+#print(os.environ.get("QT_QPA_PLATFORM"))
 #matplotlib.use('TkAgg')
 
 source_image = "data/measurement_pic.jpg"
@@ -51,7 +50,7 @@ def scanForEdges(pixel_arr, edgedImage):
 def startCalc():
     #duplicate and rotate the original picture to capture indents in the skin edge no matter of their direction
     haut = cv2.imread(source_image)
-    haut = imutils.resize(haut, width=1080, height=2040)     #add resize when taking the picture 
+    # haut = imutils.resize(haut, width=1080, height=2040) #resized image within operate_camera.py
     cv2.imwrite("data/Haut.jpg", haut)
     haut_90 = cv2.rotate(haut, cv2.ROTATE_90_CLOCKWISE)
     cv2.imwrite("data/Haut_90.jpg", haut_90)
@@ -112,7 +111,7 @@ def startCalc():
     # fig, ax = plt.subplots()
     # ax.imshow(plt_img_haut_maske)
 
-    plt.show()
+    #plt.show()
 
 if __name__ == "__main__":
     startCalc()
