@@ -10,7 +10,6 @@ import numpy as np
 matplotlib.use('TkAgg')
 
 source_image = "data/measurement_pic.jpg"
-source_image = "data/haut_bsp.jpg"
 #----------------------------------------------------------------------
 def visualizePixels(pixels, img):
 
