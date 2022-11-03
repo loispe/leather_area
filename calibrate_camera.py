@@ -45,7 +45,7 @@ def detectMarker():
                 marker_1_pos = [center_x, center_y]
 
     else:
-        raise UnboundLocalError("No markers detected! Make sure the calibration stick is placed in the pciture frame.")
+        raise UnboundLocalError("No markers detected! Make sure the calibration stick is placed in the picture frame.")
             
     if marker_0_pos[0] == -1 or marker_1_pos[0] == -1:
         raise UnboundLocalError("Coulnd't detect all marker edges! Check calibration picture!")
@@ -96,8 +96,8 @@ def calcPixelLen(img, c0, c1):
     print("> Calibration saved!")
 
     
-    cv2.imshow("Calibration", img)
-    cv2.waitKey(0)
+    # cv2.imshow("Calibration", img)
+    # cv2.waitKey(0)
     return pixel_len_mm
 #----------------------------------------------------------------------
 def main():

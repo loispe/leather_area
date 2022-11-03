@@ -4,14 +4,13 @@ import cv2
 import matplotlib
 from matplotlib import pyplot as plt
 import numpy as np
-import os
 
 #os.environ["QT_QPA_PLATFORM"] = "xcb"
 #print(os.environ.get("QT_QPA_PLATFORM"))
-#matplotlib.use('TkAgg')
+matplotlib.use('TkAgg')
 
 source_image = "data/measurement_pic.jpg"
-
+source_image = "data/haut_bsp.jpg"
 #----------------------------------------------------------------------
 def visualizePixels(pixels, img):
 
@@ -95,23 +94,24 @@ def startCalc():
     cv2.imwrite("data/maske_ergebnis.jpg", pixels_combined * 255)
     mask = Image.open("data/maske_ergebnis.jpg").convert("RGB")  
 
-    # Show results of area detection
-    # visualizePixels(area_pixels, haut)        #debugging
-    # visualizePixels(area_pixels_90, haut_90)  #debugging
-    visualizePixels(pixels_combined, haut)
-
     #layer mask and original image to allow visual verification of the detected area
     haut_maske = cv2.addWeighted(np.array(mask), 0.4, np.array(haut), 0.6, 0)
     cv2.imwrite("data/haut+maske.jpg", haut_maske)
-    cv2.imshow("Haut mit Maske", haut_maske)
-    cv2.waitKey(0)
+    # cv2.imshow("Haut mit Maske", haut_maske)
+    # cv2.waitKey(0)
 
-    # Showing the result in a plot:
+    # Debugging:
+    # Showing the results of the area detection in a plot:
+    # make sure to configure matplotlib with matplotlib.use('TkAgg'). Otherwise a error will occur (ubuntu)
+    # 
+    # visualizePixels(area_pixels, haut)        #debugging
+    # visualizePixels(area_pixels_90, haut_90)  #debugging
+    # visualizePixels(pixels_combined, haut)
+
     # plt_img_haut_maske = plt.imread("data/haut+maske.jpg")
     # fig, ax = plt.subplots()
     # ax.imshow(plt_img_haut_maske)
-
-    #plt.show()
+    # plt.show()
 
 if __name__ == "__main__":
     startCalc()
